@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lekcja 6  DOM vs React</title>
+
+    
+<script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+<style>
+.App{
+font-family: sans-serif;
+}
+
+.TimeboxEditor{
+    text-align: right;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+input{
+    min-width: 60%;
+    margin-left: 20px;
+    font-size: 16px;
+}
+button{
+    font-size: 16px;
+    margin-left: 10px;
+}
+.Timebox{
+    border:1px solid gray;
+  border-radius: 5px;
+  padding: 20px;
+text-align: center;
+}
+.Clock{
+    color:orangered;
+}
+.ProgressBar{
+    border:1px solid orangered;
+    border-radius: 5px;
+    height: 25px;
+    margin-bottom: 20px;
+    padding: 5px;
+}
+
+/* .ProgressBar>div{
+    height: 100%;
+    background-color: orangered;
+    width: calc(100% - 20%);
+    float:right;
+} */
+
+.ProgressBar::after{
+    content: "";
+    height: 100%;
+    background-color: orangered;
+    width: calc(100% - 20%);
+    float:right;
+}
+
+.inactive {
+    filter:blur(2px) grayscale(1)
+}
+
+</style>
+
+</head>
+<body>
+    <h1>Kurs Reacta tydz 1</h1>
+<div class="App">
+<div class="TimeboxEditor inactive">
+<label>What are you doing:<input value="learning React"></label>
+<label>How much time you want to spend for that: <input value="25:00 time left"></label>
+<button>Start</button>
+</div>
+
+<div class="Timebox">
+<h1>learning React</h1>
+<h2 class="Clock">25:00 time left</h2>
+
+<div id="root"></div>
+
+<div class="ProgressBar">
+    <!-- <div></div> -->
+</div>
+<button disabled>Start</button>
+<button>Stop</button>
+<button>Pause</button>
+    how many breaks: 2
+</div>
+</div>
+
+<script type="text/javascript">
+
+const rootElement=document.getElementById("root");
+
+// adding elements in JS - createElement
+const domElement = document.createElement("h2");
+domElement.className="Clock"
+domElement.textContent="Time left 22:00"
+
+rootElement.append(domElement)
+
+//adding elements by React= React.createElemet
+
+const element = React.createElement(
+    "h2",
+    {className:"Clock"},
+    "25:00 Time left"
+);
+
+ReactDOM.render(element,rootElement)
+
+</script>
+</body>
+</html>
