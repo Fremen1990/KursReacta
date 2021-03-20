@@ -1,130 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lekcja 6  DOM vs React  -  strona w JS</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lekcja 6 DOM vs React - strona w JS</title>
 
     <style>
-        .App{
+      .App {
         font-family: sans-serif;
-        }
-        
-        .TimeboxEditor{
-            text-align: right;
-            border: 1px solid gray;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        input{
-            min-width: 60%;
-            margin-left: 20px;
-            font-size: 16px;
-        }
-        button{
-            font-size: 16px;
-            margin-left: 10px;
-        }
-        .Timebox{
-            border:1px solid gray;
-          border-radius: 5px;
-          padding: 20px;
+      }
+
+      .TimeboxEditor {
+        text-align: right;
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      input {
+        min-width: 60%;
+        margin-left: 20px;
+        font-size: 16px;
+      }
+
+      button {
+        font-size: 16px;
+        margin-left: 10px;
+      }
+
+      .Timebox {
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 20px;
         text-align: center;
-        }
-        .Clock{
-            color:orangered;
-        }
-        .ProgressBar{
-            border:1px solid orangered;
-            border-radius: 5px;
-            height: 25px;
-            margin-bottom: 20px;
-            padding: 5px;
-        }
-        
-        /* .ProgressBar>div{
+      }
+
+      .Clock {
+        color: orangered;
+      }
+
+      .ProgressBar {
+        border: 1px solid orangered;
+        border-radius: 5px;
+        height: 25px;
+        margin-bottom: 20px;
+        padding: 5px;
+      }
+
+      /* .ProgressBar>div{
             height: 100%;
             background-color: orangered;
             width: calc(100% - 20%);
             float:right;
         } */
-        
-        .ProgressBar::after{
-            content: "";
-            height: 100%;
-            background-color: orangered;
-            width: calc(100% - 20%);
-            float:right;
+
+      .ProgressBar::after {
+        content: "";
+        height: 100%;
+        background-color: orangered;
+        width: calc(100% - 20%);
+        float: right;
+      }
+
+      .inactive {
+        filter: blur(2px) grayscale(1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script>
+      const rootElement = document.getElementById("root");
+
+      function createHTMLElement(
+        parentElementClass,
+        parentTagElement,
+        elem,
+        txt,
+        clas
+      ) {
+        if (parentElementClass === undefined || parentElementClass === "") {
+          const parentElement = document.querySelector(parentTagElement);
+          console.log(parentElement);
+          elem = document.createElement(elem);
+          elem.textContent = txt;
+
+          if (clas !== undefined || clas !== "") {
+            elem.className = clas;
+          }
+          parentElement.append(elem);
+        } else if (
+          parentElementClass !== undefined ||
+          parentElementClass !== ""
+        ) {
+          const parentElement = document.querySelector(parentElementClass);
+
+          elem = document.createElement(elem);
+          elem.textContent = txt;
+
+          if (clas !== undefined || clas !== "") {
+            elem.className = clas;
+          }
+          parentElement.append(elem);
         }
-        
-        .inactive {
-            filter:blur(2px) grayscale(1)
-        }
-        
-        </style>
+      }
 
-</head>
-<body>
-    
-<div id="root"></div>
+      createHTMLElement("", "div", "div", "", "App");
+      createHTMLElement(
+        ".App",
+        "",
+        "h1",
+        "Kurs Reacta Tydzień 2 Komponenty",
+        "header"
+      );
+      createHTMLElement(".App", "", "div", "", "TimeboxEditor");
+      createHTMLElement(
+        ".TimeboxEditor",
+        "",
+        "label",
+        "What are you doing: ",
+        "task-query"
+      );
+      createHTMLElement(".task-query", "", "input", "", "task");
+      createHTMLElement(".TimeboxEditor", "", "label", "", "time");
+      createHTMLElement(".TimeboxEditor", "", "button", "start", "start");
+      createHTMLElement(".App", "", "div", "", "Timebox");
+      createHTMLElement(".Timebox", "", "h1", "Learning React", "taskToDo");
+      createHTMLElement(".Timebox", "", "h2", "25:00 time left", "Clock");
+      createHTMLElement(".Timebox", "", "div", "", "ProgressBar");
+      createHTMLElement(".Timebox", "", "button", "Start", "Start");
+      createHTMLElement(".Timebox", "", "button", "Stop", "Stop");
+      createHTMLElement(".Timebox", "", "button", "Pause", "Pause");
 
+      // const h1 = document.createElement('h1');
+      // h1.textContent="Kurs Reacta Tydzień 2 Komponenty
 
-<script>
-    const rootElement =document.getElementById("root");
-
-function addElementJS (elem, txt, clas){
-elem = document.createElement(elem);
-elem.textContent=txt;
-
-if(clas!==undefined || clas!==""){
-    elem.className=clas;
-}
-// console.log(elem, clas)
-rootElement.append(elem)
-}
-
-function addElementJSInsideAnotherOne(parentElementClass, elem, txt, clas){
-
-    if(parentElementClass===undefined || parentElementClass===""){
-       const  parentElement = document.querySelector(elem);
-} else if(parentElementClass!==undefined || parentElementClass!=="") {
-  const   parentElement = document.querySelector(parentElementClass);
-
-elem = document.createElement(elem);
-elem.textContent=txt;
-
-if(clas!==undefined || clas!==""){
-elem.className=clas;
-}
-// console.log(elem, clas)
-parentElement.append(elem)
-}
-console.log(parentElement)
-}
-
-
-
-addElementJS("div", "", "App")
-addElementJS("h1","Kurs Reacta Tydzień 2 Komponenty");
-addElementJS("div", "", "TimeboxEditor inactive")
-addElementJS("label","What you will do: ",  "Task-name")
-
-addElementJSInsideAnotherOne(".Task-name", "input", "")
-
-
-
-
-
-
-// const h1 = document.createElement('h1');
-// h1.textContent="Kurs Reacta Tydzień 2 Komponenty
-
-//main component APP
-
-
-
-</script>
-</body>
+      //main component APP
+    </script>
+  </body>
 </html>
