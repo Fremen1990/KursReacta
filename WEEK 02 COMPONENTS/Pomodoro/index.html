@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lekcja 6 DOM vs React</title>
+
+    <script
+      src="https://unpkg.com/react@17/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      .App {
+        font-family: sans-serif;
+      }
+
+      .TimeboxEditor {
+        text-align: right;
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      input {
+        min-width: 60%;
+        margin-left: 20px;
+        font-size: 16px;
+      }
+      button {
+        font-size: 16px;
+        margin-left: 10px;
+      }
+      .Timebox {
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 20px;
+        text-align: center;
+      }
+      .Clock {
+        color: orangered;
+      }
+      .ProgressBar {
+        border: 1px solid orangered;
+        border-radius: 5px;
+        height: 25px;
+        margin-bottom: 20px;
+        padding: 5px;
+      }
+
+      .ProgressBar > div {
+        height: 100%;
+        background-color: orangered;
+        width: calc(100% - 20%);
+        float: left;
+      }
+
+      /* .ProgressBar::after {
+        content: "";
+        height: 100%;
+        background-color: orangered;
+        width: calc(100% - 20%);
+        float: right;
+      } */
+
+      .inactive {
+        filter: blur(2px) grayscale(1);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Kurs Reacta tydz 1</h1>
+    <div class="App">
+      <div class="TimeboxEditor inactive">
+        <label>What are you doing:<input value="learning React" /></label>
+        <label
+          >How much time you want to spend for that:
+          <input value="25:00 time left"
+        /></label>
+        <button>Start</button>
+      </div>
+
+      <div class="Timebox">
+        <h1>learning React</h1>
+
+        <div id="root"></div>
+
+        <button disabled>Start</button>
+        <button>Stop</button>
+        <button>Pause</button>
+        how many breaks: 2
+      </div>
+    </div>
+
+    <script type="text/babel">
+      function Clock({
+        hours = 0,
+        minutes = -120,
+        seconds = 0,
+        miliseconds = -5949,
+      }) {
+        // const { minutes, seconds } = props;
+
+        if (minutes > 59) {
+          hours = Math.floor(minutes / 60);
+          minutes = minutes - hours * 60;
+        } else if (minutes < 0) {
+          minutes = 0;
+        }
+
+        if (seconds > 59) {
+          minutes = Math.floor(seconds / 60);
+          seconds = seconds - minutes * 60;
+        } else if (seconds < 0) {
+          seconds = 0;
+        }
+
+        if (miliseconds > 999) {
+          seconds = Math.floor(miliseconds / 1000);
+          miliseconds = miliseconds - seconds * 1000;
+        } else if (miliseconds < 0) {
+          miliseconds = 0;
+        }
+
+        if (minutes < 9) {
+          minutes = `0${+minutes}`;
+        }
+
+        if (seconds < 9) {
+          seconds = `0${seconds}`;
+        }
+
+        if (hours < 9) {
+          hours = `0${hours}`;
+        }
+
+        if (miliseconds < 9) {
+          miliseconds = `00${miliseconds}`;
+        } else if ((miliseconds < 99) & (miliseconds > 9)) {
+          miliseconds = `0${miliseconds}`;
+        }
+
+        return (
+          <h2 className="Clock">
+            Pozostało {hours}:{minutes}:{seconds}:{miliseconds}
+          </h2>
+        );
+      }
+
+      function ProgressBar({ percent = 25, trackRemaining = true }) {
+        return (
+          <>
+            <div className="ProgressBar">
+              <div
+                style={{ width: `${percent}%` }}
+                style={trackRemaining ? { float: "left" } : { float: "right" }}
+              ></div>
+            </div>
+          </>
+        );
+      }
+
+      const rootElement = document.getElementById("root");
+
+      const element = <Clock />;
+
+      ReactDOM.render(
+        <div>
+          <Clock /> <ProgressBar />
+        </div>,
+        rootElement
+      );
+    </script>
+  </body>
+</html>
