@@ -22,7 +22,7 @@
       }
 
       .TimeboxEditor {
-        text-align: right;
+        text-align: left;
         border: 1px solid gray;
         border-radius: 5px;
         padding: 20px;
@@ -30,12 +30,13 @@
       }
       input {
         min-width: 60%;
-        margin-left: 20px;
+        margin: 10px;
         font-size: 16px;
+        display: block;
       }
       button {
         font-size: 16px;
-        margin-left: 10px;
+        margin: 10px;
       }
       .Timebox {
         border: 1px solid gray;
@@ -76,106 +77,165 @@
   </head>
   <body>
     <h1>Kurs Reacta tydz 1</h1>
-    <div class="App">
-      <div class="TimeboxEditor inactive">
-        <label>What are you doing:<input value="learning React" /></label>
-        <label
-          >How much time you want to spend for that:
-          <input value="25:00 time left"
-        /></label>
-        <button>Start</button>
-      </div>
-
-      <div class="Timebox">
-        <h1>learning React</h1>
-
-        <div id="root"></div>
-
-        <button disabled>Start</button>
-        <button>Stop</button>
-        <button>Pause</button>
-        how many breaks: 2
-      </div>
-    </div>
-
-    <script type="text/babel">
-      function Clock({
-        hours = 0,
-        minutes = -120,
-        seconds = 0,
-        miliseconds = -5949,
-      }) {
-        // const { minutes, seconds } = props;
-
-        if (minutes > 59) {
-          hours = Math.floor(minutes / 60);
-          minutes = minutes - hours * 60;
-        } else if (minutes < 0) {
-          minutes = 0;
-        }
-
-        if (seconds > 59) {
-          minutes = Math.floor(seconds / 60);
-          seconds = seconds - minutes * 60;
-        } else if (seconds < 0) {
-          seconds = 0;
-        }
-
-        if (miliseconds > 999) {
-          seconds = Math.floor(miliseconds / 1000);
-          miliseconds = miliseconds - seconds * 1000;
-        } else if (miliseconds < 0) {
-          miliseconds = 0;
-        }
-
-        if (minutes < 9) {
-          minutes = `0${+minutes}`;
-        }
-
-        if (seconds < 9) {
-          seconds = `0${seconds}`;
-        }
-
-        if (hours < 9) {
-          hours = `0${hours}`;
-        }
-
-        if (miliseconds < 9) {
-          miliseconds = `00${miliseconds}`;
-        } else if ((miliseconds < 99) & (miliseconds > 9)) {
-          miliseconds = `0${miliseconds}`;
-        }
-
-        return (
-          <h2 className="Clock">
-            Pozostało {hours}:{minutes}:{seconds}:{miliseconds}
-          </h2>
-        );
-      }
-
-      function ProgressBar({ percent = 25, trackRemaining = true }) {
-        return (
-          <>
-            <div className="ProgressBar">
-              <div
-                style={{ width: `${percent}%` }}
-                style={trackRemaining ? { float: "left" } : { float: "right" }}
-              ></div>
-            </div>
-          </>
-        );
-      }
-
-      const rootElement = document.getElementById("root");
-
-      const element = <Clock />;
-
-      ReactDOM.render(
-        <div>
-          <Clock /> <ProgressBar />
-        </div>,
-        rootElement
-      );
-    </script>
+    <div id="root"></div>
   </body>
+
+  <script type="text/babel">
+    function TimeboxEditor() {
+      return (
+        <div className="TimeboxEditor">
+          <label>
+            What are you doing:
+            <input value="learning React" />
+          </label>
+          <label>
+            How much time you want to spend for that:
+            <input value="25:00 time left" />
+          </label>
+          <button>Start</button>
+        </div>
+      );
+    }
+
+    function Clock({
+      hours = 0,
+      minutes = -120,
+      seconds = 0,
+      miliseconds = -5949,
+    }) {
+      // const { minutes, seconds } = props;
+
+      if (minutes > 59) {
+        hours = Math.floor(minutes / 60);
+        minutes = minutes - hours * 60;
+      } else if (minutes < 0) {
+        minutes = 0;
+      }
+
+      if (seconds > 59) {
+        minutes = Math.floor(seconds / 60);
+        seconds = seconds - minutes * 60;
+      } else if (seconds < 0) {
+        seconds = 0;
+      }
+
+      if (miliseconds > 999) {
+        seconds = Math.floor(miliseconds / 1000);
+        miliseconds = miliseconds - seconds * 1000;
+      } else if (miliseconds < 0) {
+        miliseconds = 0;
+      }
+
+      if (minutes < 9) {
+        minutes = `0${+minutes}`;
+      }
+
+      if (seconds < 9) {
+        seconds = `0${seconds}`;
+      }
+
+      if (hours < 9) {
+        hours = `0${hours}`;
+      }
+
+      if (miliseconds < 9) {
+        miliseconds = `00${miliseconds}`;
+      } else if ((miliseconds < 99) & (miliseconds > 9)) {
+        miliseconds = `0${miliseconds}`;
+      }
+
+      return (
+        <h2 className="Clock">
+          Pozostało {hours}:{minutes}:{seconds}:{miliseconds}
+        </h2>
+      );
+    }
+
+    function ProgressBar({ percent = 25, trackRemaining = true }) {
+      return (
+        <>
+          <div className="ProgressBar">
+            <div
+              style={{ width: `${percent}%` }}
+              style={trackRemaining ? { float: "left" } : { float: "right" }}
+            ></div>
+          </div>
+        </>
+      );
+    }
+
+    class Timebox extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          isRunning: false,
+          isPaused: false,
+          pausesCaunt: 0,
+        };
+      }
+
+      handleStart(event) {
+        console.log("start click");
+
+        this.setState({
+          isRunning: true,
+          isPaused: false,
+          pausesCaunt: 0,
+        });
+      }
+
+      handleStop(event) {
+        console.log("stop click");
+
+        this.setState({
+          isRunning: false,
+          isPaused: false,
+        });
+      }
+
+      handlePause(event) {
+        console.log("pause click");
+
+        this.setState({
+          isRunning: false,
+          isPaused: true,
+          // pausesCaunt: prevState + 1,
+        });
+      }
+
+      render() {
+        const { isRunning, isPaused, pausesCaunt } = this.state;
+
+        return (
+          <div className="Timebox">
+            <h1>learning React</h1>
+            <Clock />
+            <ProgressBar />
+            <button onClick={this.handleStart.bind(this)} disabled={isRunning}>
+              Start
+            </button>
+            <button onClick={this.handleStop.bind(this)} disabled={!isRunning}>
+              Stop
+            </button>
+            <button onClick={this.handlePause.bind(this)} disabled={!isRunning}>
+              {isPaused ? "Continue" : "Pause"}
+            </button>
+            how many breaks: {pausesCaunt}
+          </div>
+        );
+      }
+    }
+
+    function App() {
+      return (
+        <div className="App">
+          <TimeboxEditor />
+          <Timebox />
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
 </html>
