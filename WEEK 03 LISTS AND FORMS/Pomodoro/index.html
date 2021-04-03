@@ -16,6 +16,8 @@
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+
     <style>
       .App {
         font-family: sans-serif;
@@ -366,29 +368,47 @@
       }
     }
 
-    function TimeboxCreator({ onCreate }) {
-      return (
-        <div className="TimeboxCreator">
-          <label>
-            What are you doing:
-            <input />
-          </label>
-          <label>
-            How much time you want to spend for that:
-            <input />
-          </label>
-          <button onClick={onCreate}>Add Timebox</button>
-        </div>
-      );
+    class TimeboxCreator extends React.Component {
+      constructor(props) {
+        super(props);
+        this.titleInput = React.createRef();
+        this.totalTimeInMinutesInput = React.createRef();
+      }
+      handleSubmit = (event) => {
+        event.preventDefault();
+        this.props.onCreate({
+          id: uuid.v4(),
+          title: this.titleInput.current.value,
+          totalTimeInMinutes: this.totalTimeInMinutesInput.current.value,
+        });
+        this.titleInput.current.value = "";
+        this.totalTimeInMinutesInput.current.value = "";
+      };
+
+      render() {
+        return (
+          <form onSubmit={this.handleSubmit} className="TimeboxCreator">
+            <label>
+              What are you doing:
+              <input ref={this.titleInput} type="text" />
+            </label>
+            <label>
+              How much time you want to spend for that:
+              <input ref={this.totalTimeInMinutesInput} type="number" />
+            </label>
+            <button>Add Timebox</button>
+          </form>
+        );
+      }
     }
 
     class TimeboxList extends React.Component {
       state = {
         timeboxes: [
-          { title: "Learning lists", totalTimeInMinutes: 25 },
-          { title: "Learning forms etc", totalTimeInMinutes: 10 },
-          { title: "Learning components", totalTimeInMinutes: 15 },
-          { title: "Doing homework", totalTimeInMinutes: 25 },
+          { id: "a", title: "Learning lists", totalTimeInMinutes: 25 },
+          { id: "b", title: "Learning forms etc", totalTimeInMinutes: 10 },
+          { id: "c", title: "Learning components", totalTimeInMinutes: 15 },
+          { id: "d", title: "Doing homework", totalTimeInMinutes: 25 },
         ],
       };
 
@@ -413,30 +433,34 @@
           const timeboxes = prevState.timeboxes.map((timebox, index) =>
             index === indexToUpdate ? updatedTimebox : timebox
           );
+
           return { timeboxes };
         });
       };
 
-      handleCreate = () => {
-        this.addTimebox({ title: "New timebox", totalTimeInMinutes: 6 });
+      handleCreate = (createdTimebox) => {
+        this.addTimebox(createdTimebox);
       };
 
       render() {
         return (
           <>
-            <TimeboxCreator onCreate={this.handleCreate} />
+            <TimeboxCreator
+              onCreate={this.handleCreate}
+              onUpdate={this.handleUpdate}
+            />
             {this.state.timeboxes.map((timebox, index) => (
               <Timebox
-                key={index}
+                key={timebox.id}
                 title={timebox.title}
                 totalTimeInMinutes={timebox.totalTimeInMinutes}
                 onDelete={() => this.removeTimebox(index)}
-                onEdit={() =>
+                onEdit={() => {
                   this.updateTimebox(index, {
                     ...timebox,
-                    title: "Updated timebox",
-                  })
-                }
+                    title: "update",
+                  });
+                }}
               />
             ))}
           </>
@@ -452,6 +476,7 @@
           </h3>
           <button onClick={onDelete}>Delete</button>
           <button onClick={onEdit}>Edit</button>
+          <input />
         </div>
       );
     }
