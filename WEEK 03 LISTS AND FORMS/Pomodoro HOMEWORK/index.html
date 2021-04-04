@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lekcja 6 DOM vs React</title>
+
+    <script
+      src="https://unpkg.com/react@17/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+
+    <style>
+      .App {
+        font-family: sans-serif;
+      }
+
+      .Timebox {
+        border: 3px solid gray;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      .TimeboxEditor,
+      .TimeboxCreator {
+        text-align: left;
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      input {
+        min-width: 60%;
+        margin: 10px;
+        font-size: 16px;
+        display: block;
+      }
+      button {
+        font-size: 16px;
+        margin: 10px;
+      }
+      .CurrentTimebox {
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 20px;
+        text-align: center;
+      }
+      .Clock {
+        color: orangered;
+      }
+      .ProgressBar {
+        border: 1px solid orangered;
+        border-radius: 5px;
+        height: 25px;
+        margin-bottom: 20px;
+        padding: 5px;
+      }
+
+      .ProgressBar > div {
+        height: 100%;
+        background-color: orangered;
+        /* width: calc(100% - 20%); */
+        float: left;
+      }
+
+      /* .ProgressBar::after {
+        content: "";
+        height: 100%;
+        background-color: orangered;
+        width: calc(100% - 20%);
+        float: right;
+      } */
+
+      .inactive {
+        filter: blur(2px) grayscale(1);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Kurs Reacta tydz 1</h1>
+    <div id="root"></div>
+  </body>
+
+  <script type="text/babel">
+    function TimeboxEditor(props) {
+      const {
+        title,
+        totalTimeInMinutes,
+        isEditable,
+        onTitleChange,
+        onTotalTimeInMinutesChange,
+        onConfirm,
+      } = props;
+      return (
+        <div className={`TimeboxEditor ${isEditable ? "" : "inactive"}`}>
+          <label>
+            What are you doing:
+            <input
+              disabled={!isEditable}
+              value={title}
+              onChange={onTitleChange}
+            />
+          </label>
+          <label>
+            How much time you want to spend for that:
+            <input
+              disabled={!isEditable}
+              value={totalTimeInMinutes}
+              onChange={onTotalTimeInMinutesChange}
+            />
+          </label>
+          <button onClick={onConfirm} disabled={!isEditable}>
+            Accept changess
+          </button>
+        </div>
+      );
+    }
+
+    function Clock({
+      className = "",
+      hours = 0,
+      minutes = 0,
+      seconds = 0,
+      miliseconds = 0,
+    }) {
+      // const { minutes, seconds } = props;
+
+      // if (minutes > 59) {
+      //   hours = Math.floor(minutes / 60);
+      //   minutes = minutes - hours * 60;
+      // } else if (minutes < 0) {
+      //   minutes = 0;
+      // }
+
+      // if (seconds > 59) {
+      //   minutes = Math.floor(seconds / 60);
+      //   seconds = seconds - minutes * 60;
+      // } else if (seconds < 0) {
+      //   seconds = 0;
+      // }
+
+      // if (miliseconds > 999) {
+      //   seconds = Math.floor(miliseconds / 1000);
+      //   miliseconds = miliseconds - seconds * 1000;
+      // } else if (miliseconds < 0) {
+      //   miliseconds = 0;
+      // }
+
+      if (minutes < 9) {
+        minutes = `0${+minutes}`;
+      }
+
+      if (seconds < 9) {
+        seconds = `0${seconds}`;
+      }
+
+      // if (hours < 9) {
+      //   hours = `0${hours}`;
+      // }
+
+      // if (miliseconds < 9) {
+      //   miliseconds = `00${miliseconds}`;
+      // } else if ((miliseconds < 99) & (miliseconds > 9)) {
+      //   miliseconds = `0${miliseconds}`;
+      // }
+
+      return (
+        <h2 className={"Clock " + className}>
+          Time left: {minutes}:{seconds}
+        </h2>
+      );
+    }
+
+    function ProgressBar({
+      className = "",
+      percent = 0,
+      trackRemaining = true,
+    }) {
+      return (
+        <>
+          <div className={"ProgressBar " + className}>
+            <div
+              style={{ width: `${percent}%` }}
+              // style="width: 10%;"
+              // style={trackRemaining ? { float: "left" } : { float: "right" }}
+            ></div>
+          </div>
+        </>
+      );
+    }
+
+    class CurrentTimebox extends React.Component {
+      constructor(props) {
+        super(props);
+
+        this.state = {
+          isRunning: false,
+          isPaused: false,
+          pausesCaunt: 0,
+          elapsedTimeInSeconds: 0,
+        };
+
+        this.handleStart = this.handleStart.bind(this);
+        this.handleStop = this.handleStop.bind(this);
+        this.togglePause = this.togglePause.bind(this);
+      }
+
+      handleStart(event) {
+        console.log("start click");
+
+        this.setState({
+          isRunning: true,
+          isPaused: false,
+          pausesCaunt: 0,
+          // elapsedTimeInSeconds: 15 * 60 + 25,
+        });
+
+        this.startTimer();
+      }
+
+      handleStop(event) {
+        console.log("stop click");
+
+        this.setState({
+          isRunning: false,
+          isPaused: false,
+          elapsedTimeInSeconds: 0,
+        });
+
+        this.stopTimer();
+      }
+
+      startTimer() {
+        this.intervalID = window.setInterval(
+          () => {
+            this.setState((prevState) => ({
+              elapsedTimeInSeconds: prevState.elapsedTimeInSeconds + 0.1,
+            }));
+          },
+
+          100
+        );
+      }
+
+      stopTimer() {
+        window.clearInterval(this.intervalID);
+      }
+
+      togglePause() {
+        console.log("toggle pause");
+
+        this.setState(function (prevState) {
+          const isPaused = !prevState.isPaused;
+          if (isPaused) {
+            this.stopTimer();
+          } else if (!isPaused) {
+            this.startTimer();
+          }
+          return {
+            isPaused,
+            pausesCaunt: isPaused
+              ? prevState.pausesCaunt + 1
+              : prevState.pausesCaunt,
+          };
+        });
+      }
+
+      render() {
+        const {
+          isRunning,
+          isPaused,
+          pausesCaunt,
+          elapsedTimeInSeconds,
+        } = this.state;
+
+        const { title, totalTimeInMinutes, isEditable, onEdit } = this.props;
+
+        const totalTimeInSeconds = totalTimeInMinutes * 60;
+        const timeLeftInSeconds = totalTimeInSeconds - elapsedTimeInSeconds;
+        const minutesLeft = Math.floor(timeLeftInSeconds / 60);
+        const secondsLeft = Math.floor(timeLeftInSeconds % 60);
+        const progressInPercent =
+          (elapsedTimeInSeconds / totalTimeInSeconds) * 100;
+
+        return (
+          <div className={`CurrentTimebox ${isEditable ? "inactive" : ""} `}>
+            <h1>{title}</h1>
+            <Clock
+              minutes={minutesLeft}
+              seconds={secondsLeft}
+              className={isPaused ? "inactive" : ""}
+            />
+            <ProgressBar
+              percent={progressInPercent}
+              className={isPaused ? "inactive" : ""}
+            />
+            <button onClick={onEdit} disabled={isEditable}>
+              Edit
+            </button>
+            <button onClick={this.handleStart} disabled={isRunning}>
+              Start
+            </button>
+            <button onClick={this.handleStop} disabled={!isRunning}>
+              Stop
+            </button>
+            <button onClick={this.togglePause} disabled={!isRunning}>
+              {isPaused ? "Continue" : "Pause"}
+            </button>
+            How many breaks: {pausesCaunt}
+          </div>
+        );
+      }
+    }
+
+    class EditableTimebox extends React.Component {
+      state = {
+        title: "Learning React to PRO level! :) ",
+        totalTimeInMinutes: 25,
+        isEditable: true,
+      };
+
+      handleTitleChange = (event) => {
+        this.setState({ title: event.target.value });
+      };
+
+      handleTotalTimeInMinutesChange = (event) => {
+        this.setState({ totalTimeInMinutes: event.target.value });
+      };
+
+      handleConfirm = () => {
+        this.setState({ isEditable: false });
+      };
+
+      handleEdit = () => {
+        this.setState({ isEditable: true });
+      };
+
+      render() {
+        const { title, totalTimeInMinutes, isEditable } = this.state;
+
+        return (
+          <>
+            <TimeboxEditor
+              title={title}
+              totalTimeInMinutes={totalTimeInMinutes}
+              isEditable={isEditable}
+              onConfirm={this.handleConfirm}
+              onTitleChange={this.handleTitleChange}
+              onTotalTimeInMinutesChange={this.handleTotalTimeInMinutesChange}
+            />
+            <CurrentTimebox
+              isEditable={isEditable}
+              totalTimeInMinutes={totalTimeInMinutes}
+              title={title}
+              onEdit={this.handleEdit}
+            />
+          </>
+        );
+      }
+    }
+
+    class TimeboxCreator extends React.Component {
+      constructor(props) {
+        super(props);
+        this.titleInput = React.createRef();
+        this.totalTimeInMinutesInput = React.createRef();
+      }
+      handleSubmit = (event) => {
+        event.preventDefault();
+        this.props.onCreate({
+          id: uuid.v4(),
+          title: this.titleInput.current.value,
+          totalTimeInMinutes: this.totalTimeInMinutesInput.current.value,
+        });
+        this.titleInput.current.value = "";
+        this.totalTimeInMinutesInput.current.value = "";
+      };
+
+      render() {
+        return (
+          <form onSubmit={this.handleSubmit} className="TimeboxCreator">
+            <label>
+              What are you doing:
+              <input ref={this.titleInput} type="text" />
+            </label>
+            <label>
+              How much time you want to spend for that:
+              <input ref={this.totalTimeInMinutesInput} type="number" />
+            </label>
+            <button>Add Timebox</button>
+          </form>
+        );
+      }
+    }
+
+    class TimeboxUpdater extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+
+      render() {
+        return <h2>This is TimeboxUpdater</h2>;
+      }
+    }
+
+    class TimeboxList extends React.Component {
+      state = {
+        timeboxes: [
+          { id: "a", title: "Learning lists", totalTimeInMinutes: 25 },
+          { id: "b", title: "Learning forms etc", totalTimeInMinutes: 10 },
+          { id: "c", title: "Learning components", totalTimeInMinutes: 15 },
+          { id: "d", title: "Doing homework", totalTimeInMinutes: 25 },
+        ],
+      };
+
+      addTimebox = (timebox) => {
+        this.setState((prevState) => {
+          const timeboxes = [timebox, ...prevState.timeboxes];
+          return { timeboxes };
+        });
+      };
+
+      removeTimebox(indexToRemove) {
+        this.setState((prevState) => {
+          const timeboxes = prevState.timeboxes.filter(
+            (timebox, index) => index !== indexToRemove
+          );
+          return { timeboxes };
+        });
+      }
+
+      updateTimebox = (indexToUpdate, updatedTimebox) => {
+        this.setState((prevState) => {
+          const timeboxes = prevState.timeboxes.map((timebox, index) =>
+            index === indexToUpdate ? updatedTimebox : timebox
+          );
+
+          return { timeboxes };
+        });
+      };
+
+      handleCreate = (createdTimebox) => {
+        this.addTimebox(createdTimebox);
+      };
+
+      handleEditUpdate() {
+        console.log("click");
+        this.updateTimebox(index, {
+          ...timebox,
+          title: "srb",
+        });
+      }
+
+      render() {
+        return (
+          <>
+            <TimeboxCreator
+              onCreate={this.handleCreate}
+              onUpdate={this.handleUpdate}
+            />
+            {this.state.timeboxes.map((timebox, index) => (
+              <Timebox
+                key={timebox.id}
+                title={timebox.title}
+                totalTimeInMinutes={timebox.totalTimeInMinutes}
+                onDelete={() => this.removeTimebox(index)}
+                onEdit={() => {
+                  this.updateTimebox(index, {
+                    ...timebox,
+                    title: "srb",
+                  });
+                }}
+              />
+            ))}
+          </>
+        );
+      }
+    }
+
+    function Timebox({ title, totalTimeInMinutes, onDelete, onEdit }) {
+      return (
+        <div className="Timebox">
+          <h3>
+            {title} - {totalTimeInMinutes} min.
+          </h3>
+          <button onClick={onDelete}>Delete</button>
+          <button onClick={onEdit}>Edit</button>
+          <input />
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <div className="App">
+          <TimeboxList />
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</html>
