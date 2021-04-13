@@ -51,20 +51,33 @@
   .Clock {
     color: orangered;
   }
-  .ProgressBar {
-    border: 1px solid orangered;
+  .progress {
+    border: 1px solid black;
     border-radius: $border-radius;
     height: 25px;
     margin-bottom: 20px;
     padding: 5px;
 
-    > div {
+    &--big{
+      height:50px;
+    }
+    
+    &--color-red{
+      border-color: orangered;
+    }
+    &__bar {
       height: 100%;
-      background-color: orangered;
+      background-color: black;
       /* width: calc(100% - 20%); */
       float: left;
+        }
+    &--color-red .progress__bar{
+    background-color: orangered;
     }
   }
+
+
+
 
 
   /* .ProgressBar::after {
