@@ -3,6 +3,34 @@ import React from "react";
 import uuid from "uuid";
 import Clock from "./Clock";
 
+function ProgressBar({
+  className = "",
+  percent = 0,
+  trackRemaining = true,
+  big = false,
+  color = null,
+}) {
+  let progressClassName = "progress " + className;
+  if (big) {
+    progressClassName += " progress--big";
+  }
+  if (color === "red") {
+    progressClassName += " progress--color-red";
+  }
+  return (
+    <>
+      <div className={progressClassName}>
+        <div
+          className="progress__bar"
+          style={{ width: `${percent}%` }}
+          // style="width: 10%;"
+          // style={trackRemaining ? { float: "left" } : { float: "right" }}
+        ></div>
+      </div>
+    </>
+  );
+}
+
 function TimeboxEditor(props) {
   const {
     title,
@@ -30,21 +58,6 @@ function TimeboxEditor(props) {
         Accept changess
       </button>
     </div>
-  );
-}
-
-function ProgressBar({ className = "", percent = 0, trackRemaining = true }) {
-  return (
-    <>
-      <div className={"progress progress--big progress--color-red" + className}>
-        <div
-          className="progress__bar"
-          style={{ width: `${percent}%` }}
-          // style="width: 10%;"
-          // style={trackRemaining ? { float: "left" } : { float: "right" }}
-        ></div>
-      </div>
-    </>
   );
 }
 
@@ -151,6 +164,8 @@ class CurrentTimebox extends React.Component {
         <ProgressBar
           percent={progressInPercent}
           className={isPaused ? "inactive" : ""}
+          color="red"
+          big
         />
         <button onClick={onEdit} disabled={isEditable}>
           Edit
