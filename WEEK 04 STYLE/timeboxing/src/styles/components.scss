@@ -1,0 +1,86 @@
+.App {
+    font-family: sans-serif;
+  }
+
+  .Timebox {
+    border:$default-border ;
+    border-radius: $border-radius;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .TimeboxCreator {
+    background-color: lighten(aqua,30);
+  }
+
+  .TimeboxEditor {
+    background-color: darken(aquamarine,50);
+  }
+
+  .Timebox {
+    background-color: #ffaaaa;
+  }
+
+  .CurrentTimebox {
+    background-color: #ffffaa;
+  }
+  .TimeboxEditor,
+  .TimeboxCreator {
+    text-align: left;
+    border: $default-border;
+    border-radius: $border-radius;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  input {
+    min-width: 60%;
+    margin: 10px;
+    font-size: 16px;
+    display: block;
+  }
+  button {
+    font-size: 16px;
+    margin: 10px;
+  }
+  .CurrentTimebox {
+    border: 1px solid gray;
+    border-radius: $border-radius;
+    padding: 20px;
+    text-align: center;
+  }
+  .Clock {
+    color: orangered;
+  }
+  .progress {
+    border: 1px solid black;
+    border-radius: $border-radius;
+    height: 25px;
+    margin-bottom: 20px;
+    padding: 5px;
+
+    &--big{
+      height:50px;
+    }
+    
+    &--color-red{
+      border-color: orangered;
+    }
+    &__bar {
+      height: 100%;
+      background-color: black;
+      /* width: calc(100% - 20%); */
+      float: left;
+        }
+    &--color-red .progress__bar{
+    background-color: orangered;
+    }
+  }
+
+
+  /* .ProgressBar::after {
+    content: "";
+    height: 100%;
+    background-color: orangered;
+    width: calc(100% - 20%);
+    float: right;
+  } */
